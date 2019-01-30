@@ -1,86 +1,82 @@
-Unified Middleware Distribution (UMD)
-=====================================
+# Unified Middleware Distribution (UMD) 
+
+[![Build Status](https://travis-ci.org/EGI-Foundation/ansible-role-umd.svg?branch=master)](https://travis-ci.org/EGI-Foundation/ansible-role-umd) [![Docker Repository on Quay](https://quay.io/repository/egi/umd4/status "Docker Repository on Quay")](https://quay.io/repository/egi/umd4)
 
 The role deploys the repository files needed to access the products
-distributed by UMD, currently supported for Scientific Linux 6 and CentOS7.
-This role optionally deploys the Interoperable Global Trust Federation (IGTF)
-repository file.
+distributed by UMD, currently supported for Scientific Linux 6 and CEntOS7.
+This role optionally deploys the Interoperable Global Trust Federation (IGTF) repository file.
 
-Requirements
-------------
+## Using
 
-This role requires Ansible 2.0 or higher. The only dependency is EPEL, included
-in the metadata file.
+If you wish to use this role, install the role from [Ansible Galaxy](https://galaxy.ansible.com/EGI-Foundation/umd):
 
-Role Variables
---------------
+```
+ansible-galaxy install egi-foundation.umd
+```
+
+## Requirements
+
+This role requires Ansible 2.0 or higher. The only dependency is EPEL,
+included in the metadata file.
+
+## Role Variables
 
 Brief description of the variables used in the role:
 
-    # UMD release version (no default)
-    release: 4
+- `release` (int) UMD release version (no default)
+  - _e.g._  `release: 4`
+- `enable_candidate_repo` (bool) Enable the candidate repository, commonly used in the release candidate (defaults to `false`)
+  - _e.g._ `enable_candidate_repo: false`
+- `enable_testing_repo` (bool) : Enables the testing repository (defaults to 'false')
+  - _e.g._ `enable_testing_repo: false`
+- `enable_untested_repo: false` : Enables the untested repository (defaults to 'false')
+- `ca_verification: false` -  Enables the IGTF repository for trusted CAs (defaults to `false`)
+- `ca_version: 1` : CA version (defaults to '1', only if `ca_verification: true`)
+- `ca_branch: production` : CA branch (defaults to 'production', only if `ca_verification: true`)
+- `ca_verification: true`: - CA servers (defaults to 'repository.egi.eu', only if
+    `ca_verification: true`)
+  - _e.g._ `ca_server: repository.egi.eu`
+- `crl_deploy: false` : Installs 'fetch-crl' package if enabled (defaults to `false`)
+  - _e.g._ : `crl_deploy: false`
 
-    # Enables the candidate repository, commonly used in the release candidate
-    # verification (defaults to 'false')
-    enable_candidate_repo: false
+## Dependencies
 
-    # Enables the testing repository (defaults to 'false')
-    enable_testing_repo: false
+A previous dependency on [`geerlingguy.repo-epel`](https://galaxy.ansible.com/geerlingguy/repo-epel) has been removed.
+EPEL is now taken care of in this role directly.
 
-    # Enables the untested repository (defaults to 'false')
-    enable_untested_repo: false
+## Example Playbook
 
-    # Enables the IGTF repository for trusted CAs (defaults to 'false')
-    ca_verification: false
+This role can be used in several scenarios, depending on your environment. These are some examples of how to use this role.
 
-    # CA version (defaults to '1', only if 'ca_verification: true')
-    ca_version: 1
+### Just install UMD repository files (if current OS is supported)
 
-    # CA branch (defaults to 'production', only if 'ca_verification: true')
-    ca_branch: production
-
-    # CA servers (defaults to 'repository.egi.eu', only if
-    # 'ca_verification: true')
-    ca_server: repository.egi.eu
-
-    # Installs 'fetch-crl' package if enabled (defaults to 'false')
-    crl_deploy: false
-
-
-Dependencies
-------------
-
-- geerlingguy.repo-epel
-
-Example Playbook
-----------------
-
-1) Installs UMD repository files (if current OS is supported)
-
+```yaml
     - hosts: all
       roles:
          - { role: ansible-umd }
+```
 
+### Install UMD repository files, enabling the candidate repository
 
-2) Installs UMD repository files, enabling the candidate repository
-
+```yaml
     - hosts: all
       roles:
          - { role: ansible-umd, enable_candidate_repo: true }
+```
 
+### Install UMD repository files together with the IGTF repository of trusted CAs.
 
-3) Installs UMD repository files together with the IGTF repository of
-   trusted CAs.
-
+```yaml
     - hosts: all
       roles:
          - { role: ansible-umd, ca_verification: true }
-License
--------
+```
+
+## License
 
 Apache 2.0
 
-Author Information
-------------------
+## Author Information
 
-Pablo Orviz <orviz@ifca.unican.es>
+Original author Pablo Orviz <orviz@ifca.unican.es>
+For contributions see [AUTHORS.md](AUTHORS.md)

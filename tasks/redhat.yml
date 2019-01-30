@@ -1,41 +1,43 @@
 ---
+- name: Ensure EPEL is present
+  package:
+    name: epel-release
+    state: present
 
-- name: OS specific variables
-  include_vars: "{{ ansible_distribution }}{{ ansible_distribution_major_version }}.yml"
+- name: Ensure release package is present (RedHat)
+  package:
+    name: "{{ release_url[release] }}"
+    state: present
 
-- name: Download and install release package (RedHat)
-  yum: name={{ release_url[release] }} state=present
-
-- name: Add UMD base candidate repository
-  yum_repository:
-    name: "UMD-{{ release }}-candidate-base"
-    description: "UMD-{{ release }} candidate - base"
-    file: "UMD-{{ release }}-candidate"
-    baseurl: "http://repository.egi.eu/sw/production/umd/candidate/{{ release }}/{{ nick }}/x86_64/base" 
-    protect: yes
-    enabled: yes
-    priority: 1
-    gpgcheck: no
+- name: Ensure UMD base candidate repository is enabled
+  block:
+    - yum_repository:
+        name: "UMD-{{ release }}-candidate-base"
+        description: "UMD-{{ release }} candidate - base"
+        file: "UMD-{{ release }}-candidate"
+        baseurl: "http://repository.egi.eu/sw/production/umd/candidate/{{ release }}/{{ nick }}/x86_64/base"
+        protect: yes
+        enabled: yes
+        priority: 1
+        gpgcheck: no
+    - yum_repository:
+        name: "UMD-{{ release }}-candidate-updates"
+        description: "UMD-{{ release }} candidate - updates"
+        file: "UMD-{{ release }}-candidate"
+        baseurl: "http://repository.egi.eu/sw/production/umd/candidate/{{ release }}/{{ nick }}/x86_64/updates"
+        protect: yes
+        enabled: yes
+        priority: 1
+        gpgcheck: no
   when: enable_candidate_repo
 
-- name: Add UMD updates candidate repository
-  yum_repository:
-    name: "UMD-{{ release }}-candidate-updates"
-    description: "UMD-{{ release }} candidate - updates"
-    file: "UMD-{{ release }}-candidate"
-    baseurl: "http://repository.egi.eu/sw/production/umd/candidate/{{ release }}/{{ nick }}/x86_64/updates" 
-    protect: yes
-    enabled: yes
-    priority: 1
-    gpgcheck: no
-  when: enable_candidate_repo
-
-- name: Install yum-utils
+- name: Ensure yum-utils is present
   package:
     name: yum-utils
     state: latest
   when: enable_testing_repo or enable_untested_repo
 
+# these tasks are not idempotent - they should be replaced with some "replace" tasks, in a block
 - name: Enable UMD testing repository
   command: yum-config-manager --enable UMD-*-testing
   when: enable_testing_repo

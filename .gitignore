@@ -1,0 +1,9 @@
+# Ignore temp python files
+__pycache__
+*.pyc
+# Ignore intermediary Molecule states
+.molecule
+# ignore other things
+.ansible-test
+.vs/
+.vscode/

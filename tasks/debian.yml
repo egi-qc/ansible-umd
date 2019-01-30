@@ -1,15 +1,11 @@
 ---
-
-- name: OS specific variables
-  include_vars: "{{ ansible_distribution }}{{ ansible_distribution_major_version }}.yml"
-
-- apt_key:
+- name: Add Apt Key
+  apt_key:
     url: "http://repository.egi.eu/sw/production/umd/UMD-DEB-PGP-KEY"
     state: present
   when: verification_repofile is defined
 
 - name: Download and install release package (Debian)
-  apt: 
-    deb: "{{ release_url }}"
-    update_cache: yes
-  when: (ansible_distribution == "Debian")
+  apt:
+    deb: "{{ release_url[release] }}/"
+    update_cache: 'yes'

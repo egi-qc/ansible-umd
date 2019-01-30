@@ -1,0 +1,25 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+lint:
+  name: yamllint
+platforms:
+  - name: umd-centos7
+    image: centos:7
+  - name: umd-centos6
+    image: centos:6
+provisioner:
+  name: ansible
+  lint:
+    name: ansible-lint
+scenario:
+  name: umd4
+verifier:
+  name: testinfra
+  options:
+    n: 2
+    nagios: true
+  lint:
+    name: flake8

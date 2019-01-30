@@ -1,0 +1,7 @@
+---
+# Ensure a common baseline across UMD
+- name: Ensure necessary packages
+  package:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ baseline_packages }}"

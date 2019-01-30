@@ -1,23 +1,29 @@
 ---
-- fail:
-    msg: "No UMD major release defined. Please use 'release' variable."
-  when: release is not defined
+- name: OS specific variables
+  include_vars: "{{ ansible_distribution |lower}}{{ ansible_distribution_major_version }}.yml"
 
-- include_vars: ../defaults/main.yml
+- name: Fail if release is not defined
+  fail:
+    msg: "Incompatible release/OS combination. Please check 'release' variable and supported OS"
+  when: (release is not defined) or (release_url[release] is not defined)
 
-- name: Deploy Debian-specific
-  include: debian.yml
-  when: (ansible_distribution == "Debian") and (release == "3")
-
-- name: Deploy RedHat-specific
-  include: redhat.yml
-  when: (ansible_distribution == "RedHat") or (ansible_distribution == "CentOS") or (ansible_distribution == "Scientific")
+- name: Include OS-specific tasks
+  include_tasks: "{{ ansible_os_family| lower }}.yml"
 
 - name: Download verification repository files
-  get_url: url={{ item }} dest={{ sources_dir }}
-  with_items: 
-    - "{{ verification_repofile|default([]) }}"
+  get_url:
+    url: "{{ item }}"
+    dest: "{{ sources_dir }}"
+  with_items: "{{ verification_repofile|default([]) }}"
   when: verification_repofile is defined
 
 - name: Set up IGTF repository
-  include: igtf.yml
+  import_tasks: igtf.yml
+  tags:
+    - certificates
+
+- import_tasks: baseline.yml
+- import_tasks: updates.yml
+  tags:
+    - security
+    - updates
